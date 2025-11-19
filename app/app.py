@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan= lifespan)
 
 @app.post("/upload")
-async def UploadFile(
+async def upload_file(
     file: UploadFile = File(...),
     caption: str = Form(""),
     session: AsyncSession = Depends(get_async_session)
@@ -22,19 +22,19 @@ async def UploadFile(
     post = Post(
         caption = caption,
         url = "dummy url",
-        file_type = "photo",
-        file_name = 'dummy name'
+        file_type = 'photo',
+        file_name = "dummy name"
     )
-    session.add(Post)
+    session.add(post)
     await session.commit()
     await session.refresh(post)
     return post
 
 @app.get("/feed")
 async def get_feed(
-    session: AsyncSession = Depends(get_async_session)
+    session : AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(select(Post).order_by(Post.created_at.desc))
+    result = await session.execute(select(Post).order_by(Post.created_at.desc()))
     posts = [row[0] for row in result.all()]
 
     posts_data = []
@@ -49,4 +49,4 @@ async def get_feed(
                 "created_at": post.created_at.isoformat()
             }
         )
-        return {"posts": posts_data}
+    return {"posts": posts_data}
